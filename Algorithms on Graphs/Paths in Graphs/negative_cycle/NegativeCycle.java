@@ -3,45 +3,7 @@ import java.util.Scanner;
 
 public class NegativeCycle {
     private static int negativeCycle(ArrayList<Integer>[] adj, ArrayList<Integer>[] cost) {
-        long prev[] = new long[adj.length];
-        long dist[] = new long[adj.length];
-        
-        //Assign all dist to infinity/Max Integer and source node to 0 cost
-        for(int i = 0; i < adj.length; i++)
-        {
-            prev[i] = -1;
-            dist[i] = Integer.MAX_VALUE;
-        }
-        dist[0] = 0;
-        
-        //Run the algorithm |V| - 1 times
-        for(int i = 0; i < adj.length - 1; i++)
-        {   
-            for(int u = 0; u < adj.length; u++) 
-            {
-                for(int v : adj[u])
-                {
-                    if(dist[v] > dist[u] + cost[u].indexOf(v))
-                    {
-                        dist[v] = dist[u] + cost[u].indexOf(v);
-                        prev[v] = u;
-                    }
-                }
-            }
-        }
-        
-        //Run the algorithm one last time to see if any distances change
-        //No changes should occur if no negative cycles
-        for(int u = 0; u < adj.length; u++) 
-        {
-            for(int v : adj[u])
-            {
-                if(dist[v] > dist[u] + cost[u].indexOf(v))
-                {
-                    return 1; //Negative cycle since dist changed
-                }
-            }
-        }
+        // write your code here
         return 0;
     }
 
@@ -66,3 +28,4 @@ public class NegativeCycle {
         System.out.println(negativeCycle(adj, cost));
     }
 }
+

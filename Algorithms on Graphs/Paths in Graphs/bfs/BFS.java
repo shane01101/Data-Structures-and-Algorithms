@@ -6,22 +6,21 @@ import java.util.Scanner;
 public class BFS {
     private static int distance(ArrayList<Integer>[] adj, int s, int t) 
     {
-        int dist[] = new int[adj.length];
-//        for(int d : dist)
-//            d = Integer.MAX_VALUE;
-        for(int i = 0; i < dist.length; i++)
+        Queue<Integer> queue = new LinkedList<Integer>();
+        int[] dist = new int[adj.length];
+        
+        for(int i = 0; i < adj.length; i++)
             dist[i] = Integer.MAX_VALUE;
         
         dist[s] = 0;
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(s); //start with source node s
+        queue.add(s);
         
         while(!queue.isEmpty())
         {
             int u = queue.remove();
             
-            for(int v : adj[u]) //check u to v adjacent nodes
-                if(dist[v] == Integer.MAX_VALUE) //not seen
+            for(int v : adj[u])
+                if(dist[v] == Integer.MAX_VALUE)
                 {
                     queue.add(v);
                     dist[v] = dist[u] + 1;
@@ -30,7 +29,8 @@ public class BFS {
         
         if(dist[t] != Integer.MAX_VALUE)
             return dist[t];
-        else return -1; //not reachable from u to v
+        else
+            return -1;
     }
 
     public static void main(String[] args) {

@@ -4,9 +4,36 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class Bipartite {
-    private static int bipartite(ArrayList<Integer>[] adj) {
-        //write your code here
-        return -1;
+    private static final int UNASSIGNED = -1;
+    private static final int WHITE = 0;
+    private static final int BLACK = 1;
+    private static int bipartite(ArrayList<Integer>[] adj) 
+    {
+        Queue<Integer> theQueue = new LinkedList<Integer>();
+        int[] colorSet = new int[adj.length];
+        
+        for(int i = 0; i < adj.length; i++)
+            colorSet[i] = UNASSIGNED;
+        
+        colorSet[0] = WHITE;
+        theQueue.add(0);
+        
+        while(!theQueue.isEmpty())
+        {
+            int u = theQueue.remove();
+            
+            for(int v : adj[u])
+            {
+                if(colorSet[v] == UNASSIGNED)
+                {
+                    theQueue.add(v);
+                    colorSet[v] = ((colorSet[u] + 1) % 2 == 0) ? WHITE : BLACK;
+                }
+                else if(colorSet[u] == colorSet[v])
+                        return 0;
+            }
+        }
+        return 1;
     }
 
     public static void main(String[] args) {
