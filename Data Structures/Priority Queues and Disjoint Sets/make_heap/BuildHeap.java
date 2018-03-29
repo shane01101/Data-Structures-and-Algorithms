@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 public class BuildHeap {
     private int[] data;
     private List<Swap> swaps;
-    //private int size;
+    private int size;
 
     private FastScanner in;
     private PrintWriter out;
@@ -31,52 +31,42 @@ public class BuildHeap {
         }
     }
 
-    private void generateSwaps() 
-    {
-      swaps = new ArrayList<Swap>();
+    private void buildHeap() {
+      size = data.length;
+      swaps = new ArrayList<>();
       
-      //begin at n/2 and siftDown to root
-      for(int i = data.length / 2; i >= 0; i--)
-      {
-          minHeapify(swaps, i);
-      } 
+      for(int i = size/2; i>=0; i--)
+          siftDownCountSwaps(swaps, i);
     }
     
-    private void minHeapify(List<Swap> swaps, int index)
+    private void siftDownCountSwaps(List<Swap> swaps, int index)
     {
-        int size = data.length;
-        int left = 2 * index + 1;
-        int right = 2 * index + 2;
-        int smallest = -1;
-         
-        //check for left child and if smaller than parent
-        if(left < size && data[left] < data[index]) //there is a right child
-        {
-            smallest = left;
-        }
-        else //smallest is parent with no children
-            smallest = index;
+        int minIndex = index;
+        int leftChild = 2*index+1;
         
-        //check for right child and if smaller than parent
-        if(right < size && data[right] < data[smallest])
-            smallest = right;
-
-        //swap if parent with child
-        if(smallest != index)
+        if(leftChild < size && data[leftChild] < data[minIndex])
+            minIndex = leftChild;
+        
+        int rightChild = 2*index+2;
+        
+        if(rightChild < size && data[rightChild] < data[minIndex])
+            minIndex = rightChild;
+        
+        if(index != minIndex)
         {
-            swaps.add(new Swap(index, smallest));
-            int tmp = data[index];
-            data[index] = data[smallest];
-            data[smallest] = tmp;
-            minHeapify(swaps, smallest);
-        }  
+            swaps.add(new Swap(index, minIndex));
+            int temp = data[index];
+            data[index] = data[minIndex];
+            data[minIndex] = temp;
+            siftDownCountSwaps(swaps, minIndex);
+        }
     }
 
     public void solve() throws IOException {
         in = new FastScanner();
         out = new PrintWriter(new BufferedOutputStream(System.out));
         readData();
-        generateSwaps();
+        buildHeap();
         writeResponse();
         out.close();
     }

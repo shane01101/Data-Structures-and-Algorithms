@@ -1,6 +1,6 @@
 import java.io.*;
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class JobQueue {
@@ -9,6 +9,9 @@ public class JobQueue {
 
     private int[] assignedWorker;
     private long[] startTime;
+    
+    private List<Worker> workerPool;
+    int size;
 
     private FastScanner in;
     private PrintWriter out;
@@ -18,7 +21,7 @@ public class JobQueue {
     }
 
     private void readData() throws IOException {
-        numWorkers = in.nextInt();
+        numWorkers = size = in.nextInt();
         int m = in.nextInt();
         jobs = new int[m];
         for (int i = 0; i < m; ++i) {
@@ -32,8 +35,7 @@ public class JobQueue {
         }
     }
 
-
-    private void assignJobs() {
+    private void assignJobsNaive() {
         // TODO: replace this code with a faster algorithm.
         assignedWorker = new int[jobs.length];
         startTime = new long[jobs.length];
@@ -51,56 +53,75 @@ public class JobQueue {
         }
     }
     
-    private void assignJobsFast()
-    {
+    private void assignJobsOptimal() {
         assignedWorker = new int[jobs.length];
         startTime = new long[jobs.length];
-        PriorityQueue<WorkerThread>  workerQueue = 
-                new PriorityQueue<>(numWorkers, new Comparator<WorkerThread>()
-        {
-            @Override
-            public int compare (WorkerThread a, WorkerThread b) 
-            {
-               return a.timeAvailable == b.timeAvailable ? a.index - b.index :
-                    (int) (a.timeAvailable - b.timeAvailable);
-            }
-        });
+        workerPool = new ArrayList<>();
         
-        //add workers to the queue
-        for(int i = 0; i < numWorkers; i++)
-            workerQueue.add(new WorkerThread(i));
-        
-        for(int i = 0; i < jobs.length; i++)
+        buildHeap();
+        for (int i = 0; i < jobs.length; i++) 
         {
-            //Get thread to assign to job
-            WorkerThread worker = workerQueue.poll();
-            
-            //Save timecard data
-            assignedWorker[i] = worker.index;
-            startTime[i] = worker.timeAvailable;
-            
-            //reset timeAvailable to be used again and add to queue
-            worker.timeAvailable += jobs[i];
-            workerQueue.add(worker);
+            assignedWorker[i] = (int)workerPool.get(0).index;
+            startTime[i] = workerPool.get(0).priority;
+            increasePriority(0, jobs[i]);
         }
     }
     
-    private static class WorkerThread
+    private void buildHeap() {
+      for(int i = 0; i < size ; i++)
+          workerPool.add(new Worker(i, 0));
+      
+      for(int i = size/2; i>=0; i--)
+          siftDown(i);
+    }
+    
+    private void siftDown(final int index)
     {
-        int index;
-        long timeAvailable;
-        public WorkerThread (int index) 
+        int minIndex = index;
+        int leftChild = 2*index+1;
+        
+        if(leftChild < size)
+            if(workerPool.get(leftChild).priority < workerPool.get(minIndex).priority)
+                minIndex = leftChild;
+            else if(workerPool.get(leftChild).priority == workerPool.get(minIndex).priority)
+                if(workerPool.get(leftChild).index < workerPool.get(minIndex).index)
+                    minIndex = leftChild;
+        
+        int rightChild = 2*index+2;
+        
+        if(rightChild < size)
+            if(workerPool.get(rightChild).priority < workerPool.get(minIndex).priority)
+                minIndex = rightChild;
+            else if(workerPool.get(rightChild).priority == workerPool.get(minIndex).priority)
+                if(workerPool.get(rightChild).index < workerPool.get(minIndex).index)
+                    minIndex = rightChild;
+        
+        if(index != minIndex)
         {
-            this.index = index;
-            timeAvailable = 0;
+            long temp = workerPool.get(index).priority;
+            workerPool.get(index).priority = workerPool.get(minIndex).priority;
+            workerPool.get(minIndex).priority = temp;
+            
+            long temp2 = workerPool.get(index).index;
+            workerPool.get(index).index = workerPool.get(minIndex).index;
+            workerPool.get(minIndex).index = temp2;
+            
+            siftDown(minIndex);
         }
+    }
+    
+    private void increasePriority(final int index, final long newPriority)
+    {
+        long oldPriority = workerPool.get(index).priority;
+        workerPool.get(index).priority = newPriority + oldPriority;
+        siftDown(0);
     }
 
     public void solve() throws IOException {
         in = new FastScanner();
         out = new PrintWriter(new BufferedOutputStream(System.out));
         readData();
-        assignJobsFast();
+        assignJobsOptimal();
         writeResponse();
         out.close();
     }
@@ -125,5 +146,14 @@ public class JobQueue {
             return Integer.parseInt(next());
         }
     }
-}
+    
+    static class Worker {
+        long index;
+        long priority;
 
+        public Worker(long index, long priority) {
+            this.index = index;
+            this.priority = priority;
+        }
+    }
+}
