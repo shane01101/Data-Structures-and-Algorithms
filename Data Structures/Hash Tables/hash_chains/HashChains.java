@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -8,31 +9,23 @@ public class HashChains {
     private FastScanner in;
     private PrintWriter out;
     // store all strings in one list
-    private List<String> elems;
+    private List<String> [] elems;
     // for hash function
     private int bucketCount;
     private int prime = 1000000007;
     private int multiplier = 263;
-    private List<List<String>> hashTable; 
-    
+
     public HashChains()
     {
-        hashTable = new ArrayList<List<String>>();
+        
     }
-
+    
     public static void main(String[] args) throws IOException {
         new HashChains().processQueries();
     }
-    
-    public void initArray(int size)
-    {
-        for (int i = 0; i < size ;i++) 
-        {
-            hashTable.add(new ArrayList<String>());
-        }
-    }
 
-    private int hashFunc(String s) {
+    private int hashFunc(String s) 
+    {
         long hash = 0;
         for (int i = s.length() - 1; i >= 0; --i)
             hash = (hash * multiplier + s.charAt(i)) % prime;
@@ -56,70 +49,47 @@ public class HashChains {
          out.flush();
     }
 
-    private void processQuery(Query query) {
-        switch (query.type) {
-            case "add":
-                if (!elems.contains(query.s))
-                    elems.add(0, query.s);
-                break;
-            case "del":
-                if (elems.contains(query.s))
-                    elems.remove(query.s);
-                break;
-            case "find":
-                writeSearchResult(elems.contains(query.s));
-                break;
-            case "check":
-                for (String cur : elems)
-                    if (hashFunc(cur) == query.ind)
-                        out.print(cur + " ");
-                out.println();
-                // Uncomment the following if you want to play with the program interactively.
-                 out.flush();
-                break;
-            default:
-                throw new RuntimeException("Unknown query: " + query.type);
-        }
-    }
-    
-    private void processQueryFast(Query query) 
-    {
-        switch (query.type) 
+    private void processQuery(Query query) 
+    {   
+        if (query.type.equals("add")) 
         {
-            case "add":
-                if(!hashTable.get(hashFunc(query.s)).contains(query.s))
-                        hashTable.get(hashFunc(query.s)).add(0, query.s);
-                break;
-            case "del":
-                if(!hashTable.get(hashFunc(query.s)).isEmpty() ||
-                        hashTable.get(hashFunc(query.s)).contains(query.s))
-                    hashTable.get(hashFunc(query.s)).remove(query.s);
-                break;
-            case "find":
-                writeSearchResult(hashTable.get(hashFunc(query.s))
+            if(!elems[hashFunc(query.s)].contains(query.s))
+                    elems[hashFunc(query.s)].add(0, query.s);
+        } 
+        else if (query.type.equals("del")) 
+        {
+           if(!elems[hashFunc(query.s)].isEmpty() ||
+                    elems[hashFunc(query.s)].contains(query.s))
+                    elems[hashFunc(query.s)].remove(query.s);
+        }
+        else if (query.type.equals("find")) 
+        {
+            writeSearchResult(elems[hashFunc(query.s)]
                     .contains(query.s));
-                break;
-            case "check":
-                for(String s : hashTable.get(query.ind))
+        }
+        else if (query.type.equals("check")) 
+        {
+            for(String s : elems[query.ind])
                     out.print(s + " ");
                 
-                out.println();
-                out.flush();
-                break;
-            default:
-                throw new RuntimeException("Unknown query: " + query.type);
+            out.println();
+            out.flush();
         }
     }
 
     public void processQueries() throws IOException {
-        elems = new ArrayList<>();
+        //elems = new ArrayList<>();
         in = new FastScanner();
         out = new PrintWriter(new BufferedOutputStream(System.out));
         bucketCount = in.nextInt();
-        initArray(bucketCount);
+        
+        elems = new ArrayList[bucketCount];
+        for(int i = 0; i <  bucketCount; i++)
+            elems[i] = new ArrayList<String>();
+        
         int queryCount = in.nextInt();
         for (int i = 0; i < queryCount; ++i) {
-            processQueryFast(readQuery());
+            processQuery(readQuery());
         }
         out.close();
     }

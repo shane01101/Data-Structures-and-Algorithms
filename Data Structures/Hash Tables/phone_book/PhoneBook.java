@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -12,10 +11,19 @@ public class PhoneBook {
 
     private FastScanner in = new FastScanner();
     // Keep list of all existing (i.e. not deleted yet) contacts.
-    private List<Contact> contacts = new ArrayList<>();
-    HashMap<Integer, String> map = new HashMap<>(100000);
+    private static final int cardinality = 1000;
+    private List<Contact>[] contacts;
+    
+    public PhoneBook()
+    {
+        contacts = new ArrayList[cardinality];
+        
+        for(int i = 0; i < cardinality; i++)
+            contacts[i] = new ArrayList<Contact>();
+    }
 
     public static void main(String[] args) {
+        
         new PhoneBook().processQueries();
     }
 
@@ -34,62 +42,58 @@ public class PhoneBook {
         System.out.println(response);
     }
 
-    private void processQueryFast(Query query) 
+    private void processQuery(Query query) 
     {
-        switch (query.type) 
+        int hashIndex = getHashIndex(query.number);
+        int chainIndex = getChainIndex(contacts[hashIndex], query.number);
+        
+        if (query.type.equals("add")) 
         {
-            case "add":
-                map.put(query.number, query.name);
-                break;
-            case "del":
-                map.put(query.number, "");
-                break;
-            //find
-            default:
-                String name = map.get(query.number);
-                if((name == null) || name.equals(""))
-                    writeResponse("not found");
-                else
-                    writeResponse(name);
-                break;
+            if(chainIndex == -1)
+                contacts[hashIndex].add(new Contact(query.name, query.number));
+            else
+                contacts[hashIndex].get(chainIndex).name = query.name;
+        } 
+        else if (query.type.equals("del")) 
+        {
+            if(chainIndex > -1) //exists
+            {
+                contacts[hashIndex].remove(chainIndex);
+            }
         }
-    }
-    
-    private void processQuery(Query query) {
-        if (query.type.equals("add")) {
-            // if we already have contact with such number,
-            // we should rewrite contact's name
-            boolean wasFound = false;
-            for (Contact contact : contacts)
-                if (contact.number == query.number) {
-                    contact.name = query.name;
-                    wasFound = true;
-                    break;
-                }
-            // otherwise, just add it
-            if (!wasFound)
-                contacts.add(new Contact(query.name, query.number));
-        } else if (query.type.equals("del")) {
-            for (Iterator<Contact> it = contacts.iterator(); it.hasNext(); )
-                if (it.next().number == query.number) {
-                    it.remove();
-                    break;
-                }
-        } else {
+        else { //find
             String response = "not found";
-            for (Contact contact: contacts)
-                if (contact.number == query.number) {
-                    response = contact.name;
-                    break;
-                }
+            
+             if(chainIndex > -1)
+                 response = contacts[hashIndex].get(chainIndex).name;
+            
             writeResponse(response);
         }
     }
+    
+    private int getHashIndex(int num)
+    {
+        return num % cardinality;
+    }
+    
+    private int getChainIndex(List<Contact> contactHash, int num)
+    {
+        int result = -1;
+        
+        for(int i = 0; i < contactHash.size(); i++)
+            if(contactHash.get(i).number == num)
+                result = i;
+            
+        return result;
+    }
+    
 
     public void processQueries() {
+        
+        
         int queryCount = in.nextInt();
         for (int i = 0; i < queryCount; ++i)
-            processQueryFast(readQuery());
+            processQuery(readQuery());
     }
 
     static class Contact {
