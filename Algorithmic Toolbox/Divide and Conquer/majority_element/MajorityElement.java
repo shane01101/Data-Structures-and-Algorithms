@@ -2,87 +2,50 @@ import java.util.*;
 import java.io.*;
 
 public class MajorityElement {
-    private static int getMajorityElement(int[] a, int left, int right) {
-        if (left == right) {
-            return -1;
-        }
-        if (left + 1 == right) {
-            return a[left];
-        }
+    private static int getMajorityElement(int[] a, int size) 
+    {
+        int candidate = findCand(a, size);
         
-        mergeSort(a, 0, a.length - 1);
-        
-        int majorityElement = a[a.length/2];
-        int leftCount = 0;
-        int rightCount = 0;
-        
-        for(int i = a.length/2; i >= 0 ; i--) 
-            if(majorityElement == a[i])
-                leftCount++;
-
-        
-        for(int i = a.length/2 + 1; i < a.length; i++)
-            if(majorityElement == a[i])
-                rightCount++;
-        
-        if((leftCount + rightCount) > a.length / 2)
-            return 0;
-        
-        return -1;
+        return isMajority(a, size, candidate);
     }
     
-    private static void mergeSort(int[] a, int left, int right) {
-        if(left < right) {
-            int mid = (left + right) /2;
-            mergeSort(a, left, mid);
-            mergeSort(a, mid + 1, right);
-            merge(a, left, mid, right);
-        }
-    }
-    
-    public static void merge(int[] a, int left, int mid, int right) {
-        //size of 2 sub arrays
-        int sz1 = mid - left + 1;
-        int sz2 = right - mid;
+    private static int findCand(int[] a, int size)
+    {
+        int maj = 0;
+        int count = 1;
+        int i = 1;
         
-        //Temp sub arrays
-        int[] arr1 = new int[sz1];
-        int[] arr2 = new int[sz2];
-        
-        for(int i = 0; i < sz1; ++i)
-            arr1[i] = a[left + i];
-        for(int j = 0; j < sz2; ++j)
-            arr2[j] = a[mid + 1 + j];
-        
-        int i = 0;
-        int j = 0;
-        int k = left;
-        
-        while(i < sz1 && j < sz2) {
-            if(arr1[i] <= arr2[j]) {
-                a[k] = arr1[i];
-                i++;
+        while (i < size)
+        {
+            if (a[maj] == a[i])
+                count++;
+            else
+                count--;
+            
+            if(count == 0)
+            {
+                maj = i;
+                count = 1;
             }
-            else {
-                a[k] = arr2[j];
-                j++;
-            }
-            k++;
-        }
-        
-        while(i < sz1) {
-            a[k] = arr1[i];
             i++;
-            k++;
         }
-        
-        while(j < sz2) {
-            a[k] = arr2[j];
-            j++;
-            k++;
-        }
+        return a[maj];
     }
-
+    
+    private static int isMajority(int[] a, int size, int cand)
+    {
+        int count = 0;
+        for(int i = 0; i < size; i++)
+        {
+            if(a[i] == cand)
+                count++;
+        }
+        if(count > size/2)
+            return 1;
+        else 
+            return -1;
+    }
+    
     public static void main(String[] args) {
         FastScanner scanner = new FastScanner(System.in);
         int n = scanner.nextInt();
@@ -90,7 +53,7 @@ public class MajorityElement {
         for (int i = 0; i < n; i++) {
             a[i] = scanner.nextInt();
         }
-        if (getMajorityElement(a, 0, a.length) != -1) {
+        if (getMajorityElement(a, a.length) != -1) {
             System.out.println(1);
         } else {
             System.out.println(0);
@@ -124,3 +87,4 @@ public class MajorityElement {
         }
     }
 }
+
