@@ -2,8 +2,6 @@ import java.util.*;
 import java.io.*;
 
 public class is_bst {
-    public static int lastVal = Integer.MIN_VALUE;
-    
     class FastScanner {
         StringTokenizer tok = new StringTokenizer("");
         BufferedReader in;
@@ -23,6 +21,8 @@ public class is_bst {
     }
 
     public class IsBST {
+        
+        public int last_val = Integer.MIN_VALUE;
         class Node {
             int key;
             int left;
@@ -46,38 +46,66 @@ public class is_bst {
                 tree[i] = new Node(in.nextInt(), in.nextInt(), in.nextInt());
             }
         }
-
-        boolean isBinarySearchTree() 
+        boolean solve() 
         {
-            Stack<Integer> stack = new Stack<>();
-            boolean isBST = true;
-            int root = 0;
-            
-            if(nodes == 0) //empty tree
+            if(nodes == 0)
                 return true;
             
-            stack.push(root); //push root to begin iteration
-            root = tree[root].left; //move left
+            return isBST_Recursive(0);
+            //return isBinarySearchTree(0);
+        }
+        
 
-            while(!stack.isEmpty() || root != -1)
+        boolean isBinarySearchTree(int n1) 
+        {
+            boolean isBST = true;
+            int lastVal = Integer.MIN_VALUE;
+            Stack<Integer> theStack = new Stack<>();
+            int root = 0;
+            
+            if(nodes == 0)
+                return true;
+                
+            theStack.push(root);
+            root = tree[root].left;
+            
+            while(!theStack.isEmpty() || root != -1) 
             {
-                if(root != -1) //move all the way left
+                if(root != -1) //move left
                 {
-                    stack.push(root);
+                    theStack.push(root);
                     root = tree[root].left;
                 }
-                else //cant move left, pop and add to result then move right
+                else //cant move left, pop and move right
                 {
-                    int node = stack.pop();
-                    
-                    if(tree[node].key < lastVal) //compare to last inorder val
+                    int top = theStack.pop();
+
+                    if(lastVal > tree[top].key)
                         return false;
-                    lastVal = tree[node].key;
-                    //System.out.println(tree[node].key);
-                    root = tree[node].right;
+                    lastVal = tree[top].key;
+
+                    root = tree[top].right;
                 }
             }
             return isBST;
+        }
+        
+        boolean isBST_Recursive(int n) 
+        {
+            if(n == -1)
+                return true;
+            
+            if(!(isBST_Recursive(tree[n].left)))
+                return false;
+            
+            if(tree[n].key < last_val)
+                return false;
+            last_val = tree[n].key;
+            
+            if(!(isBST_Recursive(tree[n].right)))
+                return false;
+            
+            return true;
         }
     }
 
@@ -94,7 +122,7 @@ public class is_bst {
     public void run() throws IOException {
         IsBST tree = new IsBST();
         tree.read();
-        if (tree.isBinarySearchTree()) {
+        if (tree.solve()) {
             System.out.println("CORRECT");
         } else {
             System.out.println("INCORRECT");

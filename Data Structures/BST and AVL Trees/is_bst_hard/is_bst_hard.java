@@ -1,9 +1,7 @@
-
 import java.util.*;
 import java.io.*;
 
 public class is_bst_hard {
-    
     class FastScanner {
         StringTokenizer tok = new StringTokenizer("");
         BufferedReader in;
@@ -49,27 +47,24 @@ public class is_bst_hard {
 
         boolean isBinarySearchTree() 
         {
-            //empty tree or 1 node tree is a BST
             if(nodes == 0)
                 return true;
             
             return isBinarySearchTreeHelper(0, Long.MIN_VALUE, Long.MAX_VALUE);
-            
         }
         
-        boolean isBinarySearchTreeHelper(int root, long min, long max)
+        boolean isBinarySearchTreeHelper(int node, long min, long max) 
         {
-            if(root == -1) 
+            if(node == -1)
                 return true;
             
-            if((tree[root].key < min) || (tree[root].key >= max))
+            if((min > tree[node].key) || (max <= tree[node].key))
                 return false;
             
-            if((!isBinarySearchTreeHelper(tree[root].left, min, tree[root].key)) ||
-                (!isBinarySearchTreeHelper(tree[root].right, tree[root].key, max)))
-            {
+            if(!(isBinarySearchTreeHelper(tree[node].left, min, tree[node].key)) 
+                    || !(isBinarySearchTreeHelper(tree[node].right, tree[node].key, max)))
                 return false;
-            }
+            
             return true;
         }
     }
