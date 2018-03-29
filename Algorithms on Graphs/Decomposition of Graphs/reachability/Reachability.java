@@ -2,8 +2,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Reachability {
-    private static int reach(ArrayList<Integer>[] adj, int x, int y) {
+    private static int reach(ArrayList<Integer>[] adj, int x, int y) 
+    {
         boolean[] visited = new boolean[adj.length];
+        
+        for(int i = 0; i < adj.length; i++)
+            visited[i] = false;
         
         if(DFS(adj, visited, x, y))
             return 1;
@@ -17,11 +21,10 @@ public class Reachability {
             return true;
         
         visited[u] = true;
-        //System.out.print(u + " ");
         
         for(int adjacent : adj[u])
         {
-            if(!visited[adjacent])
+            if(visited[adjacent] == false)
                 if(DFS(adj, visited, adjacent, v))
                     return true;
         }
@@ -36,7 +39,7 @@ public class Reachability {
         int m = scanner.nextInt();
         ArrayList<Integer>[] adj = (ArrayList<Integer>[])new ArrayList[n];
         for (int i = 0; i < n; i++) {
-            adj[i] = new ArrayList<>();
+            adj[i] = new ArrayList<Integer>();
         }
         for (int i = 0; i < m; i++) {
             int x, y;
@@ -50,3 +53,4 @@ public class Reachability {
         System.out.println(reach(adj, x, y));
     }
 }
+

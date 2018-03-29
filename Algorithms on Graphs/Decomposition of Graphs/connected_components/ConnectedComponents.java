@@ -1,32 +1,33 @@
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ConnectedComponents 
-{
-    private static int numberOfComponents(ArrayList<Integer>[] adj) {
+public class ConnectedComponents {
+    private static int numberOfComponents(ArrayList<Integer>[] adj) 
+    {
         int result = 0;
         boolean[] visited = new boolean[adj.length];
         
         for(int i = 0; i < adj.length; i++)
+            visited[i] = false;
+        
+        for(int i = 0; i < adj.length; i++)
         {
-            if(!visited[i])
-            {
+            if(visited[i] == false)
+            {   
+                ++result;
                 DFS(adj, visited, i);
-                //increment the count of unconnected garphs
-                result++;
             }
-        }     
+        }
         return result;
     }
     
-    private static void DFS(ArrayList<Integer>[] adj, boolean[] visited, int i)
-    {   
-        visited[i] = true;
+    private static void DFS(ArrayList<Integer>[] adj, boolean[] visited, int index)
+    {
+        visited[index] = true;
         
-        for(int adjacent : adj[i])
+        for(int adjacent : adj[index])
         {
-            if(!visited[adjacent])
+            if(visited[adjacent] == false)
                 DFS(adj, visited, adjacent);
         }
     }
@@ -49,4 +50,3 @@ public class ConnectedComponents
         System.out.println(numberOfComponents(adj));
     }
 }
-

@@ -1,39 +1,36 @@
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
-import java.util.Stack;
 
 public class Toposort {
     private static ArrayList<Integer> toposort(ArrayList<Integer>[] adj) 
     {
-        //int used[] = new int[adj.length];
-        boolean[] visited = new boolean[adj.length];
-        //Stack<Integer> theStack = new Stack<>();
+        int used[] = new int[adj.length];
         ArrayList<Integer> order = new ArrayList<Integer>();
         
-        for(int i = 0; i < adj.length; i++)
-        {
-            if(!visited[i])
-                toposort(adj, visited, i, order);
-        }
+        for(int i = 0; i < used.length; i++)
+            used[i] = -1;
         
+        for(int i = 0; i < used.length; i++)
+        {
+            if(used[i] == -1)
+                dfs(adj, used, order, i);
+        }
+        Collections.reverse(order);
         return order;
     }
 
-
-    private static void toposort(ArrayList<Integer>[] adj, boolean[] visited, int v, ArrayList<Integer> order) 
+    private static void dfs(ArrayList<Integer>[] adj, int[] used, ArrayList<Integer> order, int s) 
     {
-        visited[v] = true;
+        used[s] = s;
         
-        for(int adjacent : adj[v])
+        for(int adjacent : adj[s])
         {
-            if(!visited[adjacent])
-                toposort(adj, visited, adjacent, order);
+            if(used[adjacent] == -1)
+                dfs(adj, used, order, adjacent);
         }
-        order.add(0,v);  //add to beginning, same as reverse ordering
+        order.add(s);
     }
-    
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -55,4 +52,3 @@ public class Toposort {
         }
     }
 }
-

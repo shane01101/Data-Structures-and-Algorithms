@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -6,34 +5,39 @@ public class Acyclicity {
     private static int acyclic(ArrayList<Integer>[] adj) 
     {
         boolean[] visited = new boolean[adj.length];
-        boolean[] ancestor = new boolean[adj.length];
+        boolean[] curCycle = new boolean[adj.length];
         
         for(int i = 0; i < adj.length; i++)
         {
-            if(!visited[i])
-                if(DFSCycle(adj, visited, ancestor, i))
-                    return 1;
-        }     
-        return 0;
-    }
-    
-    private static boolean DFSCycle(ArrayList<Integer>[] adj, boolean[] visited, 
-            boolean[] ancestor, int v)
-    {
-        if(!visited[v]) //visit v if not visted
+            visited[i] = false;
+            curCycle[i] = false;
+        }
+        
+        for(int i = 0; i < adj.length; i++)
         {
-            visited[v] = true;
-            ancestor[v] = true;
-
-            for(int adjacent : adj[v]) //iterate through adjacent nodes
-            {
-                if(!visited[adjacent] && (DFSCycle(adj, visited, ancestor, adjacent)))
-                    return true;
-                else if(ancestor[adjacent])
-                    return true;
+            if(visited[i] == false)
+            {   
+                if(DFSCycle(adj, visited, curCycle, i))
+                    return 1;
             }
         }
-        ancestor[v] = false; //set back to false after checking
+        return 0;
+    }
+    private static boolean DFSCycle(ArrayList<Integer>[] adj, boolean[] visited, 
+            boolean[] curCycle, int index)
+    {
+        visited[index] = true;
+        curCycle[index] = true;
+
+        for(int adjacent : adj[index])
+        {
+            if(visited[adjacent] == false && DFSCycle(adj, visited, curCycle, adjacent))
+                return true;
+            else if(curCycle[adjacent])
+                return true;
+        }
+        curCycle[index] = false;
+        
         return false;
     }
 
