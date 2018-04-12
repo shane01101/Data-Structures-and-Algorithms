@@ -31,22 +31,48 @@ public class MaxMatching {
         return adjMatrix;
     }
 
-    private int[] findMatching(boolean[][] bipartiteGraph) {
-        // Replace this code with an algorithm that finds the maximum
-        // matching correctly in all cases.
-        int numLeft = bipartiteGraph.length;
-        int numRight = bipartiteGraph[0].length;
+    private int[] findMatching(boolean[][] bipartiteGraph) 
+    {
+        int numFlights = bipartiteGraph.length;
+        int numCrews = bipartiteGraph[0].length;
+        int[] flightResults = new int[numFlights];
+        int[] crewResults = new int[numCrews];
+        Arrays.fill(flightResults, -1);
+        Arrays.fill(crewResults, -1);
 
-        int[] matching = new int[numLeft];
-        Arrays.fill(matching, -1);
-        boolean[] busyRight = new boolean[numRight];
-        for (int i = 0; i < numLeft; ++i)
-            for (int j = 0; j < numRight; ++j)
-                if (bipartiteGraph[i][j] && matching[i] == -1 && !busyRight[j]) {
-                    matching[i] = j;
-                    busyRight[j] = true;
-                }
-        return matching;
+        for(int i = 0; i < numFlights; i++)
+        {
+            boolean[] visited = new boolean[numFlights];
+            Arrays.fill(visited, false);
+            
+            maxBipartiteMatch(bipartiteGraph, i, visited, flightResults, crewResults);
+        }
+
+        return flightResults;
+    }
+    
+    private boolean maxBipartiteMatch(boolean[][] bipartiteGraph, int flightIndex, boolean[] visited, int[] flightResults, int[] crewResults)
+    {
+        if(flightIndex == -1)
+            return true;
+        
+        if(visited[flightIndex])
+            return false;         
+                    
+        visited[flightIndex] = true; //mark crew flag as seen
+        
+        for(int crewIndex = 0; crewIndex < crewResults.length; ++crewIndex)
+        {
+            if((bipartiteGraph[flightIndex][crewIndex]) && (maxBipartiteMatch(bipartiteGraph, crewResults[crewIndex], visited, flightResults, crewResults)))
+            {
+                
+                flightResults[flightIndex] = crewIndex;
+                crewResults[crewIndex] = flightIndex;
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private void writeResponse(int[] matching) {
