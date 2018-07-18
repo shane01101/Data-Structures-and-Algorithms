@@ -26,4 +26,3 @@ public class DotProduct {
         System.out.println(maxDotProduct(a, b));
     }
 }
-
