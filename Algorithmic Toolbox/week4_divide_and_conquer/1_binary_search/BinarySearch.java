@@ -3,7 +3,7 @@ import java.util.*;
 
 public class BinarySearch {
 
-    static int binarySearch(int[] a, int low, int high, int key) {
+    static int binarySearchRecursive(int[] a, int low, int high, int key) {
         if (high < low)
             return -1;
         
@@ -12,9 +12,25 @@ public class BinarySearch {
         if(key == a[mid])
             return mid;
         else if (key < a[mid])
-            return binarySearch(a, low, mid - 1, key);
+            return binarySearchRecursive(a, low, mid - 1, key);
         else
-            return binarySearch(a, mid + 1, high, key);
+            return binarySearchRecursive(a, mid + 1, high, key);
+    }
+    
+    static int binarySearchIterative(int[] a, int key) {
+        int low = 0, high = a.length - 1;
+        
+        while(low <= high) {
+            int mid = low + (high - low) /2;
+            
+            if(a[mid] == key)
+                return mid;
+            else if(a[mid] < key)
+                low = mid + 1;
+            else if(a[mid] > key)
+                high = mid - 1;
+        }
+        return -1;
     }
 
     static int linearSearch(int[] a, int x) {
@@ -38,7 +54,7 @@ public class BinarySearch {
         }
         for (int i = 0; i < m; i++) {
             //replace with the call to binarySearch when implemented
-            System.out.print(binarySearch(a, 0, a.length-1, b[i]) + " ");
+            System.out.print(binarySearchIterative(a, b[i]) + " ");
 //            System.out.print(linearSearch(a, b[i]) + " ");
         }
     }
