@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -11,19 +9,17 @@ public class PhoneBook {
 
     private FastScanner in = new FastScanner();
     // Keep list of all existing (i.e. not deleted yet) contacts.
-    private static final int cardinality = 1000;
-    private List<Contact>[] contacts;
+    private Contact[] contacts;
+    private static final int M = 10000000;
     
-    public PhoneBook()
-    {
-        contacts = new ArrayList[cardinality];
+    public PhoneBook() {
+        contacts = new Contact[M];
         
-        for(int i = 0; i < cardinality; i++)
-            contacts[i] = new ArrayList<Contact>();
+        //for(int i = 0; i < M; i++)
+        //    contacts.add(new Contact("", i));
     }
 
     public static void main(String[] args) {
-        
         new PhoneBook().processQueries();
     }
 
@@ -42,55 +38,27 @@ public class PhoneBook {
         System.out.println(response);
     }
 
-    private void processQuery(Query query) 
-    {
-        int hashIndex = getHashIndex(query.number);
-        int chainIndex = getChainIndex(contacts[hashIndex], query.number);
-        
-        if (query.type.equals("add")) 
-        {
-            if(chainIndex == -1)
-                contacts[hashIndex].add(new Contact(query.name, query.number));
+    private void processQuery(Query query) {
+        if (query.type.equals("add")) {
+            if(contacts[query.number] == null)
+                contacts[query.number] = new Contact(query.name, query.number);
             else
-                contacts[hashIndex].get(chainIndex).name = query.name;
-        } 
-        else if (query.type.equals("del")) 
-        {
-            if(chainIndex > -1) //exists
-            {
-                contacts[hashIndex].remove(chainIndex);
-            }
-        }
-        else { //find
-            String response = "not found";
+                contacts[query.number].name = query.name;
+
+        } else if (query.type.equals("del")) {
+            if(contacts[query.number] != null)
+               contacts[query.number] = null;
+        } else {
+            Contact result = contacts[query.number];
             
-             if(chainIndex > -1)
-                 response = contacts[hashIndex].get(chainIndex).name;
-            
-            writeResponse(response);
+            if(result == null)
+                writeResponse("not found");
+            else
+                writeResponse(result.name);
         }
     }
-    
-    private int getHashIndex(int num)
-    {
-        return num % cardinality;
-    }
-    
-    private int getChainIndex(List<Contact> contactHash, int num)
-    {
-        int result = -1;
-        
-        for(int i = 0; i < contactHash.size(); i++)
-            if(contactHash.get(i).number == num)
-                result = i;
-            
-        return result;
-    }
-    
 
     public void processQueries() {
-        
-        
         int queryCount = in.nextInt();
         for (int i = 0; i < queryCount; ++i)
             processQuery(readQuery());
@@ -99,6 +67,11 @@ public class PhoneBook {
     static class Contact {
         String name;
         int number;
+        
+        public Contact() {
+            name = "";
+            number = -1;
+        }
 
         public Contact(String name, int number) {
             this.name = name;
