@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 public class BuildHeap {
     private int[] data;
     private List<Swap> swaps;
-    private int size;
 
     private FastScanner in;
     private PrintWriter out;
@@ -30,43 +29,68 @@ public class BuildHeap {
           out.println(swap.index1 + " " + swap.index2);
         }
     }
-
-    private void buildHeap() {
-      size = data.length;
-      swaps = new ArrayList<>();
-      
-      for(int i = size/2; i>=0; i--)
-          siftDownCountSwaps(swaps, i);
+    
+    private void generateSwapsFast() {
+        int size = data.length;
+        swaps = new ArrayList<Swap>();
+        
+        for(int i = size/2; i >= 0; i--) {
+            siftDown(i);
+        }
+        
+//        for(int x : data)
+//            System.out.print(x + " ");
+//        System.out.println();
     }
     
-    private void siftDownCountSwaps(List<Swap> swaps, int index)
-    {
-        int minIndex = index;
-        int leftChild = 2*index+1;
+    private void siftDown(int i) {
         
-        if(leftChild < size && data[leftChild] < data[minIndex])
-            minIndex = leftChild;
+        int size = data.length;
+        int minIndex = i;
+        int lChild = 2 * i + 1;
+        int rChild = 2 * i + 2;
         
-        int rightChild = 2*index+2;
+        if(lChild < size && data[lChild] < data[minIndex])
+            minIndex = lChild;
         
-        if(rightChild < size && data[rightChild] < data[minIndex])
-            minIndex = rightChild;
+        if(rChild < size && data[rChild] < data[minIndex])
+            minIndex = rChild;
         
-        if(index != minIndex)
-        {
-            swaps.add(new Swap(index, minIndex));
-            int temp = data[index];
-            data[index] = data[minIndex];
-            data[minIndex] = temp;
-            siftDownCountSwaps(swaps, minIndex);
+        if(i != minIndex) {
+            swaps.add(new Swap(i, minIndex));
+            int t = data[i];
+            data[i] = data[minIndex];
+            data[minIndex] = t;
+            siftDown(minIndex);
         }
+    }
+
+    private void generateSwapsSlow() {
+      swaps = new ArrayList<Swap>();
+      // The following naive implementation just sorts 
+      // the given sequence using selection sort algorithm
+      // and saves the resulting sequence of swaps.
+      // This turns the given array into a heap, 
+      // but in the worst case gives a quadratic number of swaps.
+      //
+      // TODO: replace by a more efficient implementation
+      for (int i = 0; i < data.length; ++i) {
+        for (int j = i + 1; j < data.length; ++j) {
+          if (data[i] > data[j]) {
+            swaps.add(new Swap(i, j));
+            int tmp = data[i];
+            data[i] = data[j];
+            data[j] = tmp;
+          }
+        }
+      }
     }
 
     public void solve() throws IOException {
         in = new FastScanner();
         out = new PrintWriter(new BufferedOutputStream(System.out));
         readData();
-        buildHeap();
+        generateSwapsFast();
         writeResponse();
         out.close();
     }
