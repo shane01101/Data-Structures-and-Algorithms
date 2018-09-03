@@ -23,52 +23,42 @@ class Bracket {
     int position;
 }
 
-class check_brackets 
-{
-    public static void main(String[] args) throws IOException 
-    {
+class check_brackets {
+    public static void main(String[] args) throws IOException {
         InputStreamReader input_stream = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input_stream);
         String text = reader.readLine();
-        int invalidIndex = -1;
 
-        Stack<Bracket> opening_brackets_stack = new Stack<Bracket>();
-        for (int position = 0; position < text.length(); ++position) 
-        {
+        Stack<Bracket> stack = new Stack<Bracket>();
+        int errorPos = -1;
+        for (int position = 0; position < text.length(); ++position) {
             char next = text.charAt(position);
 
-            if (next == '(' || next == '[' || next == '{') 
-            {
-                opening_brackets_stack.push(new Bracket(text.charAt(position), position));
+            if (next == '(' || next == '[' || next == '{') {
+                stack.push(new Bracket(next, position));
             }
-            
-            if (next == ')' || next == ']' || next == '}') 
-            {
-                if(!opening_brackets_stack.isEmpty())
-                {
-                    Bracket top = opening_brackets_stack.pop();
-                    
-                    if(!top.Match(next))
-                    {
-                        invalidIndex = position + 1;
-                        break;
-                    }
+
+            if (next == ')' || next == ']' || next == '}') {
+                if(stack.isEmpty()) {
+                    errorPos = position;
+                    break;
                 }
-                else //empty
-                {
-                    invalidIndex = position + 1;
+                
+                Bracket top = stack.pop();
+                
+                if(!top.Match(next)) {
+                    errorPos = position;
                     break;
                 }
             }
         }
-        //invalid index must still be in the stack if no break occurred
-        if(!opening_brackets_stack.isEmpty() && invalidIndex == -1)
-            invalidIndex = opening_brackets_stack.pop().position + 1;
+        if(!stack.isEmpty() && errorPos == -1)
+            errorPos = stack.pop().position;
+        
 
-        //Print Answer
-        if(invalidIndex != -1)
-            System.out.println(invalidIndex);
-        else
+        if(errorPos == -1)
             System.out.println("Success");
+        else 
+            System.out.println(errorPos + 1);
     }
 }
