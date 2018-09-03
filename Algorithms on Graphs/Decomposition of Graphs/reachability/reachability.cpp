@@ -1,14 +1,13 @@
-#include <algorithm>
 #include <iostream>
 #include <vector>
 
 using std::vector;
 using std::pair;
 
-int number_of_strongly_connected_components(vector<vector<int> > adj) {
-  int result = 0;
+
+int reach(vector<vector<int> > &adj, int x, int y) {
   //write your code here
-  return result;
+  return 0;
 }
 
 int main() {
@@ -19,6 +18,9 @@ int main() {
     int x, y;
     std::cin >> x >> y;
     adj[x - 1].push_back(y - 1);
+    adj[y - 1].push_back(x - 1);
   }
-  std::cout << number_of_strongly_connected_components(adj);
+  int x, y;
+  std::cin >> x >> y;
+  std::cout << reach(adj, x - 1, y - 1);
 }

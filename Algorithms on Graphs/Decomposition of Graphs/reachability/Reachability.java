@@ -2,36 +2,30 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Reachability {
-    private static int reach(ArrayList<Integer>[] adj, int x, int y) 
-    {
+    private static int reach(ArrayList<Integer>[] adj, int x, int y) {
         boolean[] visited = new boolean[adj.length];
         
-        for(int i = 0; i < adj.length; i++)
-            visited[i] = false;
-        
-        if(DFS(adj, visited, x, y))
+        if (dfsReach(adj, visited, x, y))
             return 1;
         else
             return 0;
     }
     
-    private static boolean DFS(ArrayList<Integer>[] adj, boolean[] visited, int u, int v)
-    {
+    private static boolean dfsReach(ArrayList<Integer>[] adj, boolean[] visited, int u, int v) {
         if(u == v)
             return true;
         
         visited[u] = true;
         
-        for(int adjacent : adj[u])
-        {
-            if(visited[adjacent] == false)
-                if(DFS(adj, visited, adjacent, v))
+        for(int adjacent : adj[u]) {
+            if(!visited[adjacent]) {
+                visited[adjacent] = true; 
+                if(dfsReach(adj, visited, adjacent, v))
                     return true;
+            }
         }
-        
         return false;
     }
-
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
