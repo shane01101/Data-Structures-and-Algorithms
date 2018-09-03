@@ -4,33 +4,29 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class BFS {
-    private static int distance(ArrayList<Integer>[] adj, int s, int t) 
-    {
-        Queue<Integer> queue = new LinkedList<Integer>();
-        int[] dist = new int[adj.length];
+    private static int distance(ArrayList<Integer>[] adj, int s, int t) {
+        int n = adj.length;
+        int[] dist = new int[n];
+        Queue<Integer> theQueue = new LinkedList<>();
         
-        for(int i = 0; i < adj.length; i++)
+        for(int i = 0; i < n; i++)
             dist[i] = Integer.MAX_VALUE;
-        
         dist[s] = 0;
-        queue.add(s);
+        theQueue.add(s);
         
-        while(!queue.isEmpty())
-        {
-            int u = queue.remove();
+        while(!theQueue.isEmpty()) {
+            int u = theQueue.poll();
             
             for(int v : adj[u])
-                if(dist[v] == Integer.MAX_VALUE)
-                {
-                    queue.add(v);
+                if(dist[v] == Integer.MAX_VALUE) {
+                    theQueue.add(v);
                     dist[v] = dist[u] + 1;
                 }
         }
-        
-        if(dist[t] != Integer.MAX_VALUE)
-            return dist[t];
-        else
+        if(dist[t] == Integer.MAX_VALUE)
             return -1;
+        else
+            return dist[t];
     }
 
     public static void main(String[] args) {
@@ -53,3 +49,4 @@ public class BFS {
         System.out.println(distance(adj, x, y));
     }
 }
+
