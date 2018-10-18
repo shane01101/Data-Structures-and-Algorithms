@@ -23,34 +23,29 @@ public class BurrowsWheelerTransform {
         }
     }
 
-    String BWT(String text) 
-    {
+    String BWT(String text) {
+        int n = text.length();
         StringBuilder result = new StringBuilder();
-        String[] matrix = new String[text.length()];
+        String[] matrix = new String[n];
         
-        //populate matrix[] with all cyclic rotations
-        for(int i = 0; i < text.length(); i++)
-            matrix[i] = rotateArray(text, i).toString();
+        //fill array with all cyclic rotations
+        for(int i = 0; i < n; i++) {
+            matrix[i] = getRotation(text, i);
+        }
         
-        Arrays.sort(matrix); //sort lexiographically
+        //sort lexiographically
+        Arrays.sort(matrix);
         
-        //append last char at end of each matrix[] to result
-        for(int j = 0; j < matrix.length; j++)
-            result.append(matrix[j].charAt(matrix.length -1));
+        //append last letter of each string in matrix to result (BWT)
+        for(int j = 0;j < n; j++)
+            result.append(matrix[j].charAt(n-1));
 
         return result.toString();
     }
     
-    StringBuilder rotateArray(String s, int index)
-    {
-        StringBuilder result = new StringBuilder();
-        
-        for(int i = 0; i < s.length(); i++, index++)
-        {
-            result.append(String.valueOf(s.charAt(index % s.length())));
-        }
-        
-        return result;
+    String getRotation(String s, int startPos) {
+        int a = startPos % s.length();
+        return s.substring(a) + s.substring(0, a);
     }
 
     static public void main(String[] args) throws IOException {
