@@ -1,18 +1,26 @@
 import java.io.*;
 import java.util.*;
 
-class Node
+class Node2
 {
     public static final int Letters =  4;
     public static final int NA      = -1;
     public int next [];
     public boolean patternEnd;
 
-    Node ()
+    Node2 ()
     {
         next = new int [Letters];
         Arrays.fill (next, NA);
         patternEnd = false;
+    }
+    
+    boolean isLeaf() {
+        for(int i = 0; i < Letters; i++)
+            if(next[i] != NA)
+                return false;
+        
+        return true;
     }
 }
 
@@ -21,140 +29,112 @@ public class TrieMatchingExtended implements Runnable {
     {
         switch (letter)
         {
-                case 'A': return 0;
-                case 'C': return 1;
-                case 'G': return 2;
-                case 'T': return 3;
-                default: assert (false); return Node.NA;
+            case 'A': return 0;
+            case 'C': return 1;
+            case 'G': return 2;
+            case 'T': return 3;
+            default: assert (false); return Node2.NA;
+        }
+    }
+
+    List <Integer> solve (String text, int n, List <String> patterns) {
+        List <Integer> result = new ArrayList <Integer> ();
+        List<Node2> trie = buildTrie(patterns);
+        
+        for(int i = 0; i < text.length(); i++) {
+            if(prefixTrieMatching(text.substring(i), trie))
+                result.add(i);
+        }
+
+        return result;
+    }
+    
+    boolean prefixTrieMatching(String text, List<Node2> trie) {
+        
+        int curNodePtr = 0;
+        Node2 curNode = trie.get(curNodePtr);
+        int patternIndex = 0;
+        char c = text.charAt(patternIndex);
+        
+        while(true) {
+            
+            if(curNode.isLeaf() || curNode.patternEnd) {
+                return true;
+            }
+            else if (curNode.next[letterToIndex(c)] != Node2.NA){
+                 curNodePtr = curNode.next[letterToIndex(c)];
+                 curNode = trie.get(curNodePtr);
+                 
+                 if(curNode.isLeaf() || (curNode.patternEnd && text.length() >= patternIndex)) //reached leaf, pattern found
+                     return true;
+                 
+                 //text length out of bounds
+                 if(patternIndex == text.length() -1)
+                     return false;
+                 
+                 c = text.charAt(++patternIndex);
+            }
+            else
+                return false;
         }
     }
     
-    List<Node> buildTrie(List<String> patterns) {
-        List<Node> trie = new ArrayList<>();
+    List<Node2> buildTrie(List<String> patterns) {
+        List<Node2> trie = new ArrayList<>();
+        trie.add(new Node2()); //root
         
-        trie.add(new Node()); //root node
-        
-        for(String s : patterns)
-        {
+        for(String s : patterns) {
             int curNodePtr = 0;
             int endOfPattern = s.length() - 1;
-            int charIndex = 0;
+            int curCharIndex = 0; 
             
-            for(char c : s.toCharArray())
-            {   
-                Node currentNode = trie.get(curNodePtr);
+            for(char c : s.toCharArray()) {
+                Node2 currentNode = trie.get(curNodePtr);
                 
                 if(currentNode.next[letterToIndex(c)] != Node.NA)
                     curNodePtr = currentNode.next[letterToIndex(c)];
-                else
-                {
-                    Node newNode = new Node();
+                else { //add the letter the the map
+                    Node2 newNode = new Node2();
                     trie.add(newNode);
                     currentNode.next[letterToIndex(c)] = trie.size() - 1;
                     curNodePtr = trie.size() - 1;
-                }
+                }  
                 
-                
-                if(charIndex == endOfPattern)
-                {
-                    Node endOfPatternNode = trie.get(curNodePtr);
-                    endOfPatternNode.patternEnd = true;
+                //mark end of pattern
+                if(endOfPattern == curCharIndex) {
+                    Node2 endNode = trie.get(curNodePtr);
+                    endNode.patternEnd = true;
                 }
-                charIndex++;
+                curCharIndex++;
             }
         }
         return trie;
     }
 
-    List <Integer> solve (String text, int n, List <String> patterns) {
-        List <Integer> result = new ArrayList <> ();
-        List<Node> trie = buildTrie(patterns);       
-        
-        for(int i = 0; i < text.length(); i++)
-        {
-            char symbol = text.charAt(i);
-            Node curNode = trie.get(0);
-            int curNodePtr = 0;
-            int textIndex = i;
-            int textSize = 0;
-            int patternSize = 0;
-            
-            while(true)
-            {
-                //if this is a leaf
-                if(curNode.next[0] == -1 && curNode.next[1] == -1 
-                    && curNode.next[2] == -1 && curNode.next[3] == -1)
-                {
-                    result.add(i);
-                    break;
-                }
-                //traverse
-                else if(curNode.next[letterToIndex(symbol)] != Node.NA)
-                {
-                    curNodePtr = curNode.next[letterToIndex(symbol)];
-                    curNode = trie.get(curNodePtr);
-                    patternSize++;
-                    
-                    if(textIndex < text.length() - 1) //increment text index
-                    {
-                        symbol = text.charAt(++textIndex);
-                        textSize ++;
-                        
-                        Node temp = trie.get(curNodePtr);
-                        if(temp.patternEnd)
-                        {
-                            result.add(i);
-                            break;
-                        }
-                        
-                        
-                    }
-                    else if(textSize != patternSize - 1) 
-                    {
-                        //text has ended before finding a leaf in pattern
-                        break;
-                    }
-                    else
-                    {
-                        Node temp = trie.get(curNodePtr);
-                        if(temp.patternEnd)
-                        {
-                            result.add(i);
-                            break;
-                        }
-                    }
-                }
-                else //no match
-                    break;
+    public void run () {
+        try {
+            BufferedReader in = new BufferedReader (new InputStreamReader (System.in));
+            String text = in.readLine ();
+            int n = Integer.parseInt (in.readLine ());
+            List <String> patterns = new ArrayList <String> ();
+            for (int i = 0; i < n; i++) {
+                patterns.add (in.readLine ());
+            }
+
+            List <Integer> ans = solve (text, n, patterns);
+
+            for (int j = 0; j < ans.size (); j++) {
+                System.out.print ("" + ans.get (j));
+                System.out.print (j + 1 < ans.size () ? " " : "\n");
             }
         }
-        return result;
-    }
-
-    public void run () {
-            try {
-                    BufferedReader in = new BufferedReader (new InputStreamReader (System.in));
-                    String text = in.readLine ();
-                    int n = Integer.parseInt (in.readLine ());
-                    List <String> patterns = new ArrayList <String> ();
-                    for (int i = 0; i < n; i++) {
-                            patterns.add (in.readLine ());
-                    }
-
-                    List <Integer> ans = solve (text, n, patterns);
-
-                    for (int j = 0; j < ans.size (); j++) {
-                            System.out.print ("" + ans.get (j));
-                            System.out.print (j + 1 < ans.size () ? " " : "\n");
-                    }
-            }
-            catch (Throwable e) {
-                    e.printStackTrace ();
-                    System.exit (1);
-            }
+        catch (Throwable e) {
+            e.printStackTrace ();
+            System.exit (1);
+        }
     }
 
     public static void main (String [] args) {
-            new Thread (new TrieMatchingExtended ()).start ();
+        new Thread (new TrieMatchingExtended ()).start ();
     }
 }
