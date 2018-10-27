@@ -26,29 +26,25 @@ public class KnuthMorrisPratt {
     // Find all the occurrences of the pattern in the text and return
     // a list of all positions in the text (starting from 0) where
     // the pattern starts in the text.
-    public List<Integer> findPattern(String pattern, String text) 
-    {
-        ArrayList<Integer> result = new ArrayList<>();
-        String S = pattern + "$" + text;
-        int[] prefixArray = computePrefix(S);
+    public List<Integer> findPattern(String pattern, String text) {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        String allText = pattern + "$" + text;
+        int[] s = computePrefix(allText);
         
-        for(int i = pattern.length() + 1; i <= S.length() - 1; i++)
-        {
-            if(prefixArray[i] == pattern.length())
+        for(int i = pattern.length() + 1; i < allText.length(); i++) {
+            if(s[i] == pattern.length())
                 result.add(i - 2 * pattern.length());
         }
         return result;
     }
     
-    public int[] computePrefix(String pattern)
-    {
+    int[] computePrefix(String pattern) {
         int[] s = new int[pattern.length()];
         s[0] = 0;
         int border = 0;
         
-        for (int i = 1; i <= pattern.length() - 1 ; i++)
-        {
-            while (border > 0 && pattern.charAt(i) != pattern.charAt(border))
+        for(int i = 1; i < pattern.length(); i++) {
+            while(border > 0 && pattern.charAt(i) != pattern.charAt(border))
                 border = s[border - 1];
             
             if(pattern.charAt(i) == pattern.charAt(border))
