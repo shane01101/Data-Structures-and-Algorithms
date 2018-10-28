@@ -4,28 +4,18 @@ import java.util.Scanner;
 public class Reachability {
     private static int reach(ArrayList<Integer>[] adj, int x, int y) {
         boolean[] visited = new boolean[adj.length];
-        
-        if (dfsReach(adj, visited, x, y))
-            return 1;
-        else
-            return 0;
+        explore(adj, visited, x);
+        return visited[x] && visited[y] ? 1 : 0;
     }
     
-    private static boolean dfsReach(ArrayList<Integer>[] adj, boolean[] visited, int u, int v) {
-        if(u == v)
-            return true;
-        
+    private static void explore(ArrayList<Integer>[] adj, boolean[] visited, int u) {
         visited[u] = true;
         
-        for(int adjacent : adj[u]) {
-            if(!visited[adjacent]) {
-                visited[adjacent] = true; 
-                if(dfsReach(adj, visited, adjacent, v))
-                    return true;
-            }
-        }
-        return false;
+        for(int adjacent: adj[u])
+            if(!visited[adjacent])
+                explore(adj, visited, adjacent);
     }
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -47,4 +37,3 @@ public class Reachability {
         System.out.println(reach(adj, x, y));
     }
 }
-
