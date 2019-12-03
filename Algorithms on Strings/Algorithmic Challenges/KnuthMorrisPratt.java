@@ -27,36 +27,34 @@ public class KnuthMorrisPratt {
     // a list of all positions in the text (starting from 0) where
     // the pattern starts in the text.
     public List<Integer> findPattern(String pattern, String text) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        List<Integer> results = new ArrayList<>();
         String str = pattern + "$" + text;
-        int[] prefixArr = computePrefixArr(str);
+        int[] prefixArray = computePrefix(str);
 
-        // search right of $
         for(int i = pattern.length() + 1; i < str.length(); i++) {
-            if(prefixArr[i] == pattern.length())
-                result.add(i - 2 * pattern.length());
+            if(pattern.length() == prefixArray[i])
+                results.add(i - 2*pattern.length());
         }
-        return result;
+        return results;
     }
 
-    private int[] computePrefixArr(String pattern) {
-        int[] prefixArr = new int[pattern.length()];
+    private int[] computePrefix(String pattern) {
         int border = 0;
-        prefixArr[0] = 0;
+        int[] prefixArray = new int[pattern.length()];
+        prefixArray[0] = 0;
 
         for(int i = 1; i < pattern.length(); i++) {
-            while(border > 0 && pattern.charAt(i) != pattern.charAt(border)) {
-                border = prefixArr[border - 1];
-            }
+            while(border > 0 && pattern.charAt(border) != pattern.charAt(i))
+                border = prefixArray[border - 1];
 
-            if(pattern.charAt(i) == pattern.charAt(border))
+            if(pattern.charAt(border) == pattern.charAt(i))
                 ++border;
             else
                 border = 0;
 
-            prefixArr[i] = border;
+            prefixArray[i] = border;
         }
-        return prefixArr;
+        return prefixArray;
     }
 
     static public void main(String[] args) throws IOException {
