@@ -3,41 +3,42 @@ import java.util.*;
 
 public class BinarySearch {
 
-    static int binarySearchRecursive(int[] a, int low, int high, int key) {
-        if (high < low)
-            return -1;
-        
-        int mid = low + ((high - low) /2);
-        
-        if(key == a[mid])
-            return mid;
-        else if (key < a[mid])
-            return binarySearchRecursive(a, low, mid - 1, key);
-        else
-            return binarySearchRecursive(a, mid + 1, high, key);
+    static int binarySearchRecursive(int[] arr, int key) {
+        return binarySearchHelperRecursive(arr, 0, arr.length - 1, key);
     }
-    
-    static int binarySearchIterative(int[] a, int key) {
-        int low = 0, high = a.length - 1;
-        
-        while(low <= high) {
-            int mid = low + (high - low) /2;
-            
-            if(a[mid] == key)
+
+    static int binarySearchIterative(int[] arr, int key) {
+        int low = 0;
+        int high = arr.length - 1;
+        int mid;
+
+        while (low <= high) {
+            mid = low + (high - low) / 2;
+
+            if(key == arr[mid])
                 return mid;
-            else if(a[mid] < key)
-                low = mid + 1;
-            else if(a[mid] > key)
+            else if (key < arr[mid]) {
                 high = mid - 1;
+            }
+            else {
+                low = mid + 1;
+            }
         }
         return -1;
     }
 
-    static int linearSearch(int[] a, int x) {
-        for (int i = 0; i < a.length; i++) {
-            if (a[i] == x) return i;
-        }
-        return -1;
+    static int binarySearchHelperRecursive(int[] arr, int low, int high, int key) {
+        if (high < low)
+            return -1;
+
+        int mid = low + (high - low) / 2;
+
+        if(arr[mid] == key)
+            return mid;
+        else if (key < arr[mid])
+            return binarySearchHelperRecursive(arr, low, mid - 1, key);
+        else
+            return binarySearchHelperRecursive(arr, mid+1, high, key);
     }
 
     public static void main(String[] args) {
@@ -50,12 +51,11 @@ public class BinarySearch {
         int m = scanner.nextInt();
         int[] b = new int[m];
         for (int i = 0; i < m; i++) {
-          b[i] = scanner.nextInt();
+            b[i] = scanner.nextInt();
         }
         for (int i = 0; i < m; i++) {
             //replace with the call to binarySearch when implemented
             System.out.print(binarySearchIterative(a, b[i]) + " ");
-//            System.out.print(linearSearch(a, b[i]) + " ");
         }
     }
     static class FastScanner {
