@@ -1,28 +1,22 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 public class BFS {
     private static int distance(ArrayList<Integer>[] adj, int s, int t) {
-        int n = adj.length;
-        int[] dist = new int[n];
         Queue<Integer> theQueue = new LinkedList<>();
-        
-        for(int i = 0; i < n; i++)
-            dist[i] = Integer.MAX_VALUE;
-        
+        int[] dist = new int[adj.length];
+        Arrays.fill(dist, Integer.MAX_VALUE);
         dist[s] = 0;
         theQueue.add(s);
-        
+
         while(!theQueue.isEmpty()) {
             int top = theQueue.poll();
-            
-            for(int adjacent: adj[top])
-                if(dist[adjacent] == Integer.MAX_VALUE) {
-                    theQueue.add(adjacent);
-                    dist[adjacent] = dist[top] + 1;
+
+            for(int v : adj[top]) {
+                if(dist[v] == Integer.MAX_VALUE) {
+                    theQueue.add(v);
+                    dist[v] = dist[top] + 1;
                 }
+            }
         }
         return dist[t] == Integer.MAX_VALUE ? -1 : dist[t];
     }

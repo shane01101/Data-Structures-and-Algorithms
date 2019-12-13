@@ -1,37 +1,26 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 public class Bipartite {
-    private static final int BLACK = 0;
-    private static final int WHITE = 1;
+    private static final int WHITE = 0;
+    private static final int BLACK = 1;
+
     private static int bipartite(ArrayList<Integer>[] adj) {
-        int n = adj.length;
-        int[] dist = new int[n];
         Queue<Integer> theQueue = new LinkedList<>();
-        
-        for(int i = 0; i < n; i++)
-            dist[i] = Integer.MAX_VALUE;
-        
-        int source = 0;
-        dist[source] = BLACK;
-        theQueue.add(source);
-        
+        int[] dist = new int[adj.length];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0] = WHITE;
+        theQueue.add(0);
+
         while(!theQueue.isEmpty()) {
             int top = theQueue.poll();
-            
-            for(int adjacent: adj[top])
-                if(dist[adjacent] == Integer.MAX_VALUE) {
-                    theQueue.add(adjacent);
-                    //assign neighbor opposite color
-                    dist[adjacent] = dist[top] == BLACK ? WHITE : BLACK;
-                    
-                }
-                else //has been explored, check if nodes are same color neighbors
-                    if((dist[top] == BLACK && dist[adjacent] == BLACK) 
-                            || (dist[top] == WHITE && dist[adjacent] == WHITE))
-                        return 0;
+
+            for(int v: adj[top]) {
+                if(dist[v] == Integer.MAX_VALUE) {
+                    theQueue.add(v);
+                    dist[v] = dist[top] == WHITE ? BLACK : WHITE;
+                } else if(dist[top] == dist[v])
+                    return 0;
+            }
         }
         return 1;
     }
@@ -54,4 +43,3 @@ public class Bipartite {
         System.out.println(bipartite(adj));
     }
 }
-
